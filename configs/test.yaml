@@ -1,0 +1,15 @@
+dataset:
+  test_path: ./data/datasets/docred_joint/test_joint.json
+
+model:
+  model_path: ./data/models/docred_joint/joint_multi_instance/model.ckpt
+  tokenizer_path: ./data/models/docred_joint/joint_multi_instance
+  encoder_config_path: ./data/models/docred_joint/joint_multi_instance
+
+inference:
+  test_batch_size: 1
+
+hydra:
+  run:
+    dir: ./data/runs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  output_subdir: run_config

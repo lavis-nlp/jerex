@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Joint Extraction Examples</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        .mention {
+            color: #000000;
+            font-weight: bold;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .head {
+            color: #ee6666;
+            font-weight: bold;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .tail {
+            color: #3388bb;
+            font-weight: bold;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .type {
+            display: block;
+            font-size: 12px;
+        }
+
+        .border-row-td {
+            border-bottom: solid 1px black !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .border-row-tr {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .border-col-td {
+            border-right: solid 1px black !important;
+        }
+
+        .tp {
+            background-color: #c9eec1;
+        }
+
+        .fp {
+            background-color: #e7ecfc;
+        }
+
+        .fn {
+            background-color: #ffd5cb;
+        }
+
+        .tp-box {
+            float: left;
+            background-color: #c9eec1;
+            border: solid 1px black;
+            width: 20px;
+            height: 20px;
+        }
+
+        .fp-box {
+            float: left;
+            background-color: #e7ecfc;
+            border: solid 1px black;
+            width: 20px;
+            height: 20px;
+        }
+
+        .fn-box {
+            float: left;
+            background-color: #ffd5cb;
+            border: solid 1px black;
+            width: 20px;
+            height: 20px;
+        }
+
+        .doc-perfect {
+            color: #03e06f;
+            vertical-align: middle;
+        }
+
+        .doc-good {
+            color: #e0ca4f;
+            vertical-align: middle;
+        }
+
+        .doc-bad {
+            color: #ff2942;
+            vertical-align: middle;
+        }
+
+        .vertical-center {
+            display: flex;
+            align-items: center;
+        }
+
+        .doc {
+            margin-bottom: 10px;
+        }
+
+        .doc-text {
+            white-space: normal;
+        }
+
+        table.table-bordered {
+            border: 1px solid black;
+            margin-top: 20px;
+        }
+
+        table.table-bordered > thead > tr > th {
+            border: 1px solid black;
+        }
+
+        table.table-bordered > tbody > tr > td {
+            border: 1px solid black;
+        }
+
+    </style>
+</head>
+<body style="overflow-x:scroll; white-space: nowrap; padding-left: 10px; padding-top: 10px;">
+
+<h2> Joint Extraction Examples </h2>
+
+<p></p>
+
+<div id="evaluation">
+    <div id="accordion">
+        {% for doc in docs %}
+            {% set outer_loop = loop %}
+
+            <div class="card doc">
+                <div class="collapsed" data-toggle="collapse"
+                     data-target="#collapse-{{ outer_loop.index0 }}" style="cursor: pointer;">
+                    <div class="card-header" id="heading-{{ outer_loop.index0 }}">
+                        <div class="row vertical-center">
+                            <div class="col-1 vertical-center">
+                                ({{ outer_loop.index0 }}) &nbsp;
+                            </div>
+
+                            <div class="col">
+                                <div class="doc-text">
+                                    <b>{{ doc["text"] | safe }}</b>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="collapse-{{ outer_loop.index0 }}" class="collapse" data-parent="#accordion">
+                    <div class="card-body">
+                        <div id="accordion-{{ outer_loop.index0 }}">
+                            {% for task_label in ["mentions", "clusters", "entities", "relations"] %}
+                                {% set task = doc[task_label] %}
+
+                                <div class="card">
+                                    <div class="collapsed" data-toggle="collapse"
+                                         data-target="#collapse-{{ task_label }}-{{ outer_loop.index0 }}"
+                                         style="cursor: pointer;">
+                                        <div class="card-header" id="heading-{{ task_label }}-{{ outer_loop.index0 }}">
+                                            <div class="row vertical-center">
+                                                <div class="col-1 vertical-center">
+                                                    {{ task_label[0]|upper }}{{ task_label[1:] }}
+                                                    ({{ task["results"]|length }})
+                                                </div>
+                                                {% set counts = task["counts"] %}
+                                                {% set scores = task["scores"] %}
+                                                <div class="col">
+                                                    <div class="row">
+                                                        <div class="col-sm">
+                                                            TP: {{ counts["tp"] }}
+                                                        </div>
+                                                        <div class="col-sm">
+                                                            FP: {{ counts["fp"] }}
+                                                        </div>
+                                                        <div class="col-sm">
+                                                            FN: {{ counts["fn"] }}
+                                                        </div>
+
+                                                        <div class="col-sm">
+                                                            Precision: {{ "%.2f"|format(scores["prec_micro"]) }}
+                                                        </div>
+                                                        <div class="col-sm">
+                                                            Recall: {{ "%.2f"|format(scores["rec_micro"]) }}
+                                                        </div>
+                                                        <div class="col-sm">
+                                                            F1: {{ "%.2f"|format(scores["f1_micro"]) }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="collapse-{{ task_label }}-{{ outer_loop.index0 }}" class="collapse"
+                                         data-parent="#accordion-{{ outer_loop.index0 }}">
+                                        <div class="card-body">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                <tr>
+                                                    <th>Type</th>
+                                                    <th>Text
+                                                        {#   (<span class="head">Head</span> - <span#}
+                                                        {#   class="tail">Tail</span>)#}
+                                                    </th>
+                                                </tr>
+                                                </thead>
+
+                                                <tbody>
+
+                                                {% for r in task["results"] %}
+                                                    <tr class="{{ r['c'] }}">
+                                                        <td>
+                                                            {% if r["type"] %}
+                                                                {{ r["type"] }}
+                                                            {% else %}
+                                                                /
+                                                            {% endif %}
+                                                        </td>
+
+                                                        <td class="doc-text">{{ r["text"] }}</td>
+                                                    </tr>
+                                                {% endfor %}
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+</html>
