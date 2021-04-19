@@ -50,7 +50,6 @@ python ./jerex_train.py training.max_epochs=40
 
 ## Training/Inference speed and memory consumption
 Performing a search over token spans (and pairs of spans) in the input document (as in JEREX) can be quite (CPU/GPU) memory demanding. If you run into memory issues (i.e. crashing of training/inference), these settings may help:
-- Changing precision from fp32 to fp16 ('misc.precision: 16') will lower memory consumption.
 - 'training.max_spans'/'training.max_coref_pairs'/'training.max_rel_pairs' (or 'inference.max_spans'/'inference.max_coref_pairs'/'inference.max_rel_pairs'): 
 These settings restrict the number of spans/mention pairs for coreference resolution/mention pairs for MI relation classification that are processed simultaneously. 
 Setting these to a lower number reduces training/inference speed, but lowers memory consumption. 
