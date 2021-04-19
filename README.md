@@ -17,7 +17,7 @@ PyTorch code for JEREX: "Joint Entity-Level Relation Extractor". For a descripti
 
 
 ### Fetch data
-Fetch end-to-end (joint) DocRED [1] dataset split. For the original DocRED split, see https://github.com/thunlp/DocRED
+Fetch end-to-end (joint) DocRED [1] dataset split. For the original DocRED split, see https://github.com/thunlp/DocRED :
 ```
 bash ./scripts/fetch_dataset.sh
 ```
@@ -28,7 +28,7 @@ bash ./scripts/fetch_models.sh
 ```
 
 ## Examples
-(1) Train JEREX using the end-to-end split
+(1) Train JEREX using the end-to-end split:
 ```
 python ./jerex_train.py
 ```
