@@ -38,8 +38,12 @@ python ./jerex_train.py
 python ./jerex_test.py
 ```
 
-## Hyperparameters
+## Configuration / Hyperparameters
 - The hyperparameters used in our paper are set as default. You can adjust hyperparameters and other configuration settings in the 'train.yaml' and 'test.yaml' under ./configs
+- Settings can also be overriden via command line, e.g.:
+```
+python ./jerex_train.py training.max_epochs=40
+```
 - A brief explanation of available configuration settings can be found in './configs.py'
 - Besides the main JEREX model ('joint_multi_instance') and the 'global' baseline ('joint_global') you can also train each sub-component ('mention_localization', 'coreference_resolution', 'entity_classification',
     'relation_classification_multi_instance', 'relation_classification_global') individually. Just set 'model.model_type' accordingly (e.g. 'model.model_type: joint_global')
