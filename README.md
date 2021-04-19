@@ -13,7 +13,7 @@ PyTorch code for JEREX: "Joint Entity-Level Relation Extractor". For a descripti
   - scikit-learn (tested with version 0.21.3)
   - tqdm (tested with version 4.43.0)
   - numpy (tested with version 1.18.1)
-  - jinja2 (tested with version 2.11.1)
+  - jinja2 (tested with version 2.11.3)
 
 
 ### Fetch data
