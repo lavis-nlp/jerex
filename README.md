@@ -55,5 +55,5 @@ If the entity mentions in your dataset are usually shorter than 10 tokens, you c
 
 ## References
 ```
-[1] Yuan Yao, Deming Ye, Peng Li, Xu Han, Yankai Lin,Zhenghao Liu, Zhiyuan Liu, Lixin Huang, Jie Zhou,and Maosong Sun. 2019.  DocRED: A Large-ScaleDocument-Level  Relation  Extraction  Dataset.InProceedings of the 57th Annual Meeting of the As-sociation for Computational Linguistics, pages 764–777, Florence, Italy. ACL.
+[1] Yuan Yao, Deming Ye, Peng Li, Xu Han, Yankai Lin,Zhenghao Liu, Zhiyuan Liu, Lixin Huang, Jie Zhou,and Maosong Sun. 2019.  DocRED: A Large-Scale Document-Level  Relation  Extraction  Dataset. In Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics, pages 764–777, Florence, Italy. ACL.
 ```
