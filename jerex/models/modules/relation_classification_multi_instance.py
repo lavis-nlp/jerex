@@ -30,8 +30,8 @@ class RelationClassificationMultiInstance(nn.Module):
         # chunk processing to reduce memory usage
         max_pairs = max_pairs if max_pairs is not None else rel_mention_pairs.shape[1]
         rel_mention_pair_reprs = torch.zeros([batch_size, rel_mention_pairs.shape[1], 768]).to(self._device)
-        h_large = h.unsqueeze(1)
-        h_large = h_large.repeat(1, max_pairs, 1, 1)
+        h = h.unsqueeze(1)
+
         for i in range(0, rel_mention_pairs.shape[1], max_pairs):
             # classify relation candidates
             chunk_rel_mention_pair_ep = rel_mention_pair_ep[:, i:i + max_pairs]
@@ -39,8 +39,8 @@ class RelationClassificationMultiInstance(nn.Module):
             chunk_rel_ctx_masks = rel_ctx_masks[:, i:i + max_pairs]
             chunk_rel_token_distances = rel_token_distances[:, i:i + max_pairs]
             chunk_rel_sentence_distances = rel_sentence_distances[:, i:i + max_pairs]
+            chunk_h = h.expand(-1, chunk_rel_ctx_masks.shape[1], -1, -1)
 
-            chunk_h = h_large[:, :chunk_rel_ctx_masks.shape[1], :, :]
             chunk_rel_logits = self._create_mention_pair_representations(
                 entity_pair_reprs, chunk_rel_mention_pair_ep, chunk_rel_mention_pairs,
                 chunk_rel_ctx_masks,
