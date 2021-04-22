@@ -323,7 +323,7 @@ def train(cfg: TrainConfig):
     if cfg.datasets.test_path is not None:
         # test
         data_module.setup('test')
-        trainer.test(model, datamodule=data_module)
+        trainer.test(datamodule=data_module)
 
 
 def test(cfg: TestConfig):
