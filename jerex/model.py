@@ -300,7 +300,7 @@ def train(cfg: TrainConfig):
                        max_rel_pairs_inference=cfg.inference.max_rel_pairs,
                        max_span_size=cfg.sampling.max_span_size)
 
-    checkpoint_callback = ModelCheckpoint(dirpath='checkpoint', mode='max')
+    checkpoint_callback = ModelCheckpoint(dirpath='checkpoint', mode='max', monitor='valid_f1')
 
     tb_logger = pl.loggers.TensorBoardLogger('.', 'tb')
     csv_logger = pl.loggers.CSVLogger('.', 'csv')
