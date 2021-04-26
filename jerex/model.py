@@ -48,9 +48,9 @@ class JEREXModel(pl.LightningModule):
                                                         do_lower_case=lowercase,
                                                         cache_dir=cache_path)
 
-        encoder_config = BertConfig.from_pretrained(encoder_config_path or encoder_path, cache_dir=cache_path)
+        self._encoder_config = BertConfig.from_pretrained(encoder_config_path or encoder_path, cache_dir=cache_path)
 
-        self.model = models.create_model(model_class, encoder_config=encoder_config, tokenizer=self._tokenizer,
+        self.model = models.create_model(model_class, encoder_config=self._encoder_config, tokenizer=self._tokenizer,
                                          encoder_path=encoder_path, entity_types=entity_types,
                                          relation_types=relation_types,
                                          prop_drop=prop_drop, meta_embedding_size=meta_embedding_size,
@@ -200,6 +200,14 @@ class JEREXModel(pl.LightningModule):
                                                                  num_training_steps=updates_total)
         return [optimizer], [{'scheduler': scheduler, 'name': 'learning_rate', 'interval': 'step', 'frequency': 1}]
 
+    def save_tokenizer(self, path):
+        """ Saves tokenizer do disk """
+        self._tokenizer.save_pretrained(path)
+
+    def save_encoder_config(self, path):
+        """ Saves encoder config to disk """
+        self._encoder_config.save_pretrained(path)
+
     def _get_optimizer_params(self):
         """ Get parameters to optimize """
         param_optimizer = list(self.model.named_parameters())
@@ -300,7 +308,10 @@ def train(cfg: TrainConfig):
                        max_rel_pairs_inference=cfg.inference.max_rel_pairs,
                        max_span_size=cfg.sampling.max_span_size)
 
-    checkpoint_callback = ModelCheckpoint(dirpath='checkpoint', mode='max', monitor='valid_f1')
+    checkpoint_path = 'checkpoint'
+    checkpoint_callback = ModelCheckpoint(dirpath=checkpoint_path, mode='max', monitor='valid_f1')
+    model.save_tokenizer(checkpoint_path)
+    model.save_encoder_config(checkpoint_path)
 
     tb_logger = pl.loggers.TensorBoardLogger('.', 'tb')
     csv_logger = pl.loggers.CSVLogger('.', 'csv')
