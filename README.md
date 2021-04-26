@@ -7,7 +7,7 @@ PyTorch code for JEREX: "Joint Entity-Level Relation Extractor". For a descripti
 ### Requirements
 - Required
   - Python 3.7+
-  - PyTorch (tested with version 1.8.1)
+  - PyTorch (tested with version 1.8.1 - see [here](https://pytorch.org/get-started/locally/) on how to install the correct version)
   - PyTorch Lightning (tested with version 1.2.7)
   - transformers (+sentencepiece, e.g. with 'pip install transformers[sentencepiece]', tested with version 4.5.1)
   - hydra-core (tested with version 1.0.6)
