@@ -18,7 +18,8 @@ class DocREDDataModule(pl.LightningDataModule):
                  train_batch_size: int = 1, valid_batch_size: int = 1, test_batch_size: int = 1,
                  sampling_processes: int = 4, neg_mention_count: int = 50,
                  neg_relation_count: int = 50, neg_coref_count: int = 50,
-                 max_span_size: int = 10, neg_mention_overlap_ratio: float = 0.5):
+                 max_span_size: int = 10, neg_mention_overlap_ratio: float = 0.5,
+                 final_valid_evaluate: bool = False):
         super().__init__()
 
         if types_path is not None:
@@ -64,6 +65,8 @@ class DocREDDataModule(pl.LightningDataModule):
         self._valid_dataset = None
         self._test_dataset = None
 
+        self._final_valid_evaluate = final_valid_evaluate
+
     def prepare_data(self):
         pass
 
@@ -87,22 +90,23 @@ class DocREDDataModule(pl.LightningDataModule):
                 self._valid_dataset = DocREDDataset(dataset_path=self._valid_path,
                                                     entity_types=self._entity_types,
                                                     relation_types=self._relation_types,
-                                                    neg_mention_count=self._neg_mention_count,
-                                                    neg_coref_count=self._neg_coref_count,
-                                                    neg_rel_count=self._neg_relation_count,
                                                     max_span_size=self._max_span_size,
-                                                    neg_mention_overlap_ratio=self._neg_mention_overlap_ratio,
                                                     tokenizer=self._tokenizer)
 
                 self._valid_dataset.switch_task(self._task_type)
                 self._valid_dataset.switch_mode(DocREDDataset.INFERENCE_MODE)
 
-        if (stage == 'test' or stage is None) and self._test_path is not None:
-            self._test_dataset = DocREDDataset(dataset_path=self._test_path,
-                                               entity_types=self._entity_types,
-                                               relation_types=self._relation_types,
-                                               max_span_size=self._max_span_size,
-                                               tokenizer=self._tokenizer)
+        if (stage == 'test' or stage is None) and (self._test_path is not None or
+                                                   (self._final_valid_evaluate is True and
+                                                    self._valid_path is not None)):
+            if self._test_path is not None:
+                self._test_dataset = DocREDDataset(dataset_path=self._test_path,
+                                                   entity_types=self._entity_types,
+                                                   relation_types=self._relation_types,
+                                                   max_span_size=self._max_span_size,
+                                                   tokenizer=self._tokenizer)
+            else:
+                self._test_dataset = self._valid_dataset
 
             self._test_dataset.switch_task(self._task_type)
             self._test_dataset.switch_mode(DocREDDataset.INFERENCE_MODE)

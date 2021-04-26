@@ -38,6 +38,7 @@ distribution:
 misc:
   store_predictions: true
   store_examples: true
+  final_valid_evaluate: true
 
 hydra:
   run:

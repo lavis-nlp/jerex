@@ -1,5 +1,6 @@
 import os
 import pickle
+import warnings
 from multiprocessing import Lock
 
 import pytorch_lightning as pl
@@ -18,6 +19,7 @@ _predictions_write_lock = Lock()
 
 class JEREXModel(pl.LightningModule):
     """ Implements the training, validation and testing routines of JEREX. """
+
     def __init__(self, model_type: str, tokenizer_path: str, encoder_path: str = None,
                  encoder_config_path: str = None, cache_path: str = None, lowercase: bool = False,
                  entity_types: dict = None, relation_types: dict = None,
@@ -259,6 +261,10 @@ def train(cfg: TrainConfig):
     if cfg.misc.seed is not None:
         pl.seed_everything(cfg.misc.seed)
 
+    if cfg.misc.final_valid_evaluate and cfg.datasets.test_path is not None:
+        warnings.warn("You set 'final_valid_evaluate=True' and specified a test path. "
+                      "The best model will be evaluated on the dataset specified in 'test_path'.")
+
     model_class = models.get_model(cfg.model.model_type)
 
     tokenizer = BertTokenizer.from_pretrained(cfg.model.tokenizer_path, do_lower_case=cfg.sampling.lowercase,
@@ -277,7 +283,9 @@ def train(cfg: TrainConfig):
                                    neg_relation_count=cfg.sampling.neg_relation_count,
                                    neg_coref_count=cfg.sampling.neg_coref_count,
                                    max_span_size=cfg.sampling.max_span_size,
-                                   neg_mention_overlap_ratio=cfg.sampling.neg_mention_overlap_ratio)
+                                   neg_mention_overlap_ratio=cfg.sampling.neg_mention_overlap_ratio,
+                                   final_valid_evaluate=cfg.misc.final_valid_evaluate
+                                                        and cfg.datasets.test_path is None)
 
     data_module.setup('fit')
 
@@ -293,7 +301,7 @@ def train(cfg: TrainConfig):
                        ed_embeddings_count=cfg.model.ed_embeddings_count,
                        token_dist_embeddings_count=cfg.model.token_dist_embeddings_count,
                        sentence_dist_embeddings_count=cfg.model.sentence_dist_embeddings_count,
-                       position_embeddings_count= cfg.model.position_embeddings_count,
+                       position_embeddings_count=cfg.model.position_embeddings_count,
                        mention_threshold=cfg.model.mention_threshold, coref_threshold=cfg.model.coref_threshold,
                        rel_threshold=cfg.model.rel_threshold,
                        mention_weight=cfg.loss.mention_weight, entity_weight=cfg.loss.entity_weight,
@@ -331,7 +339,8 @@ def train(cfg: TrainConfig):
 
     trainer.fit(model, datamodule=data_module)
 
-    if cfg.datasets.test_path is not None:
+    # either evaluate on test_path or on valid_path if 'final_valid_evaluate=True'
+    if cfg.datasets.test_path is not None or cfg.misc.final_valid_evaluate:
         # test
         data_module.setup('test')
         trainer.test(datamodule=data_module)
@@ -377,6 +386,3 @@ def test(cfg: TestConfig):
     # test
     data_module.setup('test')
     trainer.test(model, datamodule=data_module)
-
-
-

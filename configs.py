@@ -164,6 +164,12 @@ class MiscConfig:
     # performance profiler to use
     profiler: Optional[str] = None
 
+    # Test the best model on the validation set after training
+    # also saves predictions and example visualizations (in case of joint model) files.
+    # Should only be set to True if test_path is unset (if test_path is set, the dataset specified there is
+    # used for final testing)
+    final_valid_evaluate: bool = False
+
 
 @dataclass
 class LoggingConfig:
@@ -175,7 +181,6 @@ class LoggingConfig:
     # logging
     flush_logs_every_n_steps: int = 1000
     log_every_n_steps: int = 1000
-
 
 
 @dataclass
