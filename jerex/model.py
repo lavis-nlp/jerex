@@ -37,7 +37,7 @@ class JEREXModel(pl.LightningModule):
                  max_spans_train: int = None, max_spans_inference: int = None,
                  max_coref_pairs_train: int = None, max_coref_pairs_inference: int = None,
                  max_rel_pairs_train: int = None, max_rel_pairs_inference: int = None,
-                 examples_filename: str = 'examples_test.html',
+                 examples_filename: str = 'examples.html',
                  store_examples=True, store_predictions=True, predictions_filename='predictions.json',
                  tmp_predictions_filename='.predictions_tmp.json', **kwargs):
         super().__init__()
