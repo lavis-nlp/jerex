@@ -1,7 +1,7 @@
 # Note: Test set labels are hidden. A 'predictions.json' file is stored after evaluation, which can be
 # uploaded to the original DocRED CodaLab challenge.
 dataset:
-  test_path: ./data/datasets/docred/dev.json
+  test_path: ./data/datasets/docred/test.json
 
 model:
   model_path: ./data/models/docred/rel_classify_multi_instance/model.ckpt
