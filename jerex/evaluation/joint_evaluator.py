@@ -111,10 +111,11 @@ class JointEvaluator(Evaluator):
     def store_predictions(self, predictions, documents, path):
         converted_predictions = []
 
-        for doc_predictions in predictions:
+        for doc_predictions, doc in zip(predictions, documents):
             doc_converted_predictions = dict()
             mentions, clusters, entities, relations, relations_et = doc_predictions
 
+            doc_converted_predictions['tokens'] = [t.phrase for t in doc.tokens]
             doc_converted_predictions['mentions'] = mentions
             doc_converted_predictions['clusters'] = [[mentions.index(s) for s in c] for c in clusters]
             doc_converted_predictions['entities'] = [dict(cluster=clusters.index(e[0]),
@@ -144,6 +145,25 @@ class JointEvaluator(Evaluator):
 
         self._store_examples(example_docs, path, template='joint_examples.html')
 
+    def _convert_example(self, doc: Document, gt_mentions: List[Tuple], pred_mentions: List[Tuple],
+                         gt_clusters: List[Tuple], pred_clusters: List[Tuple],
+                         gt_entities: List[Tuple], pred_entities: List[Tuple],
+                         gt_relations: List[Tuple], pred_relations: List[Tuple]):
+        tokens = [t.phrase for t in doc.tokens]
+        mention_tmp_args = self._get_tp_fn_fp(gt_mentions, pred_mentions,
+                                              tokens, self._mention_to_html)
+        cluster_tmp_args = self._get_tp_fn_fp(gt_clusters, pred_clusters,
+                                              tokens, self._cluster_to_html)
+
+        entity_tmp_args = self._get_tp_fn_fp(gt_entities, pred_entities,
+                                             tokens, self._entity_to_html, type_idx=1)
+        relation_tmp_args = self._get_tp_fn_fp(gt_relations, pred_relations,
+                                               tokens, self._rel_to_html, type_idx=2)
+
+        text = " ".join(tokens)
+        return dict(mentions=mention_tmp_args, clusters=cluster_tmp_args,
+                    entities=entity_tmp_args, relations=relation_tmp_args, text=text)
+
     def _store_examples(self, example_docs: List[Dict], file_path: str, template: str):
         template_path = os.path.join(SCRIPT_PATH, 'templates', template)
 
@@ -154,7 +174,7 @@ class JointEvaluator(Evaluator):
         # write to disc
         template.stream(docs=example_docs).dump(file_path)
 
-    def _get_tp_fn_fp(self, gt, pred, encoding, to_html, type_idx=None):
+    def _get_tp_fn_fp(self, gt, pred, tokens, to_html, type_idx=None):
         if gt or pred:
             scores = jerex.evaluation.scoring.score_single(gt, pred, type_idx=type_idx)
         else:
@@ -181,48 +201,27 @@ class JointEvaluator(Evaluator):
 
             if s in gt:
                 if s in pred:
-                    tp.append(dict(text=to_html(s, encoding), type=type_verbose, c='tp'))
+                    tp.append(dict(text=to_html(s, tokens), type=type_verbose, c='tp'))
                 else:
-                    fn.append(dict(text=to_html(s, encoding), type=type_verbose, c='fn'))
+                    fn.append(dict(text=to_html(s, tokens), type=type_verbose, c='fn'))
             else:
-                fp.append(dict(text=to_html(s, encoding), type=type_verbose, c='fp'))
+                fp.append(dict(text=to_html(s, tokens), type=type_verbose, c='fp'))
 
         return dict(results=tp + fp + fn, counts=dict(tp=len(tp), fp=len(fp), fn=len(fn)), scores=scores)
 
-    def _convert_example(self, doc: Document, gt_mentions: List[Tuple], pred_mentions: List[Tuple],
-                         gt_clusters: List[Tuple], pred_clusters: List[Tuple],
-                         gt_entities: List[Tuple], pred_entities: List[Tuple],
-                         gt_relations: List[Tuple], pred_relations: List[Tuple]):
-        encoding = doc.encodings
-        mention_tmp_args = self._get_tp_fn_fp(gt_mentions, pred_mentions,
-                                              encoding, self._mention_to_html)
-        cluster_tmp_args = self._get_tp_fn_fp(gt_clusters, pred_clusters,
-                                              encoding, self._cluster_to_html)
-
-        entity_tmp_args = self._get_tp_fn_fp(gt_entities, pred_entities,
-                                             encoding, self._entity_to_html, type_idx=1)
-        relation_tmp_args = self._get_tp_fn_fp(gt_relations, pred_relations,
-                                               encoding, self._rel_to_html, type_idx=2)
-
-        text = self._prettify(self._tokenizer.decode(encoding))
-        return dict(mentions=mention_tmp_args, clusters=cluster_tmp_args,
-                    entities=entity_tmp_args, relations=relation_tmp_args, text=text)
-
-    def _mention_to_html(self, mention: Tuple, encoding: List[int]):
+    def _mention_to_html(self, mention: Tuple, tokens: List[str]):
         start, end = mention[:2]
 
         tag_start = ' <span class="mention">'
 
-        ctx_before = self._tokenizer.decode(encoding[:start])
-        m = self._tokenizer.decode(encoding[start:end])
-        ctx_after = self._tokenizer.decode(encoding[end:])
+        ctx_before = " ".join(tokens[:start])
+        m = " ".join(tokens[start:end])
+        ctx_after = " ".join(tokens[end:])
 
         html = ctx_before + tag_start + m + '</span> ' + ctx_after
-        html = self._prettify(html)
-
         return html
 
-    def _cluster_to_html(self, cluster: Tuple, encoding: List[int]):
+    def _cluster_to_html(self, cluster: Tuple, tokens: List[str]):
         cluster = list(cluster)
         cluster = sorted(cluster)
 
@@ -232,17 +231,15 @@ class JointEvaluator(Evaluator):
         last_end = None
         for mention in cluster:
             start, end = mention
-            ctx_before = self._tokenizer.decode(encoding[last_end:start])
-            m = self._tokenizer.decode(encoding[start:end])
+            ctx_before = " ".join(tokens[last_end:start])
+            m = " ".join(tokens[start:end])
             html += ctx_before + tag_start + m + '</span> '
             last_end = end
 
-        html += self._tokenizer.decode(encoding[cluster[-1][1]:])
-        html = self._prettify(html)
-
+        html += " ".join(tokens[cluster[-1][1]:])
         return html
 
-    def _entity_to_html(self, entity: Tuple, encoding: List[int]):
+    def _entity_to_html(self, entity: Tuple, tokens: List[str]):
         cluster, entity_type = entity
         cluster = list(cluster)
         cluster = sorted(cluster)
@@ -253,17 +250,15 @@ class JointEvaluator(Evaluator):
         last_end = None
         for mention in cluster:
             start, end = mention
-            ctx_before = self._tokenizer.decode(encoding[last_end:start])
-            m = self._tokenizer.decode(encoding[start:end])
+            ctx_before = " ".join(tokens[last_end:start])
+            m = " ".join(tokens[start:end])
             html += ctx_before + tag_start + m + '</span> '
             last_end = end
 
-        html += self._tokenizer.decode(encoding[cluster[-1][1]:])
-        html = self._prettify(html)
-
+        html += " ".join(tokens[cluster[-1][1]:])
         return html
 
-    def _rel_to_html(self, relation: Tuple, encoding: List[int]):
+    def _rel_to_html(self, relation: Tuple, tokens: List[str]):
         head, tail, rel_type = relation
 
         mentions = []
@@ -284,17 +279,10 @@ class JointEvaluator(Evaluator):
         last_end = None
         for mention in mentions:
             start, end, h_or_t = mention
-            ctx_before = self._tokenizer.decode(encoding[last_end:start])
-            m = self._tokenizer.decode(encoding[start:end])
+            ctx_before = " ".join(tokens[last_end:start])
+            m = " ".join(tokens[start:end])
             html += ctx_before + (head_tag if h_or_t == 'h' else tail_tag) + m + '</span> '
             last_end = end
 
-        html += self._tokenizer.decode(encoding[mentions[-1][1]:])
-        html = self._prettify(html)
-
+        html += " ".join(tokens[mentions[-1][1]:])
         return html
-
-    def _prettify(self, text: str):
-        text = text.replace('_start_', '').replace('_classify_', '').replace('<unk>', '').replace('⁇', '')
-        text = text.replace('[CLS]', '').replace('[SEP]', '').replace('[PAD]', '')
-        return text
