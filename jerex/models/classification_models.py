@@ -4,8 +4,8 @@ from transformers import BertModel
 from transformers import BertPreTrainedModel
 
 from jerex import util
-from jerex.evaluation.classification_evaluator import MentionClassificationEvaluator, RelClassificationEvaluator, \
-    EntityClassificationEvaluator, CorefClassificationEvaluator
+from jerex.evaluation.classification_evaluator import MentionLocalizationEvaluator, RelClassificationEvaluator, \
+    EntityClassificationEvaluator, CoreferenceResolutionEvaluator
 from jerex.loss import RelationClassificationLoss, MentionLocalizationLoss, EntityClassificationLoss, \
     CoreferenceResolutionLoss
 from jerex.task_types import TaskType
@@ -25,7 +25,7 @@ class MentionLocalizationModel(BertPreTrainedModel):
 
     TASK_TYPE = TaskType.MENTION_LOCALIZATION
     LOSS = MentionLocalizationLoss
-    EVALUATOR = MentionClassificationEvaluator
+    EVALUATOR = MentionLocalizationEvaluator
     MONITOR_METRIC = ('mention', 'f1_micro')
 
     def __init__(self, config: BertConfig,
@@ -67,7 +67,7 @@ class CoreferenceResolutionModel(BertPreTrainedModel):
 
     TASK_TYPE = TaskType.COREFERENCE_RESOLUTION
     LOSS = CoreferenceResolutionLoss
-    EVALUATOR = CorefClassificationEvaluator
+    EVALUATOR = CoreferenceResolutionEvaluator
     MONITOR_METRIC = ('coref', 'f1_micro')
 
     def __init__(self, config: BertConfig,

@@ -11,7 +11,7 @@ from jerex.evaluation.evaluator import Evaluator
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
-class MentionClassificationEvaluator(Evaluator):
+class MentionLocalizationEvaluator(Evaluator):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -58,7 +58,7 @@ class MentionClassificationEvaluator(Evaluator):
         pass
 
 
-class CorefClassificationEvaluator(Evaluator):
+class CoreferenceResolutionEvaluator(Evaluator):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
