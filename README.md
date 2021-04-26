@@ -66,6 +66,10 @@ python ./jerex_train.py training.max_epochs=40
 - A brief explanation of available configuration settings can be found in './configs.py'
 - Besides the main JEREX model ('joint_multi_instance') and the 'global' baseline ('joint_global') you can also train each sub-component ('mention_localization', 'coreference_resolution', 'entity_classification',
     'relation_classification_multi_instance', 'relation_classification_global') individually. Just set 'model.model_type' accordingly (e.g. 'model.model_type: joint_global')
+    
+## Prediction result inspection / Postprocessing
+- When testing a model ('./jerex_test.py') or by either specifying a test dataset (using 'datasets.test_path' configuration) or setting 'final_valid_evaluate' to True (using 'misc.final_valid_evaluate=true' configuration) during training ('./jerex_train.py'), a file containing the model's predictions is stored ('predictions.json'). 
+- By using a joint model ('joint_multi_instance' /  'joint_global'), a file ('examples.html') containing visualizations of all prediction results is also stored alongside 'predictions.json'.
 
 ## Training/Inference speed and memory consumption
 Performing a search over token spans (and pairs of spans) in the input document (as in JEREX) can be quite (CPU/GPU) memory demanding. If you run into memory issues (i.e. crashing of training/inference), these settings may help:
