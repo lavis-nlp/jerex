@@ -18,26 +18,44 @@ PyTorch code for JEREX: "Joint Entity-Level Relation Extractor". For a descripti
 
 
 ### Fetch data
-Fetch end-to-end (joint) DocRED [1] dataset split. For the original DocRED split, see https://github.com/thunlp/DocRED :
+Execute the following steps before running the examples.
+
+(1) Fetch end-to-end (joint) DocRED [1] dataset split. For the original DocRED split, see https://github.com/thunlp/DocRED :
 ```
 bash ./scripts/fetch_dataset.sh
 ```
 
-Fetch model checkpoints (joint multi-instance model (end-to-end split) and relation classification multi-instance model (original split)):
+(2) Fetch model checkpoints (joint multi-instance model (end-to-end split) and relation classification multi-instance model (original split)):
 ```
 bash ./scripts/fetch_models.sh
 ```
 
 ## Examples
-(1) Train JEREX using the end-to-end split:
+
+### End-to-end (joint) model
+(1) Train JEREX (joint model) using the end-to-end split:
 ```
-python ./jerex_train.py
+python ./jerex_train.py --config-path configs/docred_joint
 ```
 
-(2) Evaluate JEREX on the end-to-end split (you need to fetch the model first):
+(2) Evaluate JEREX (joint model) on the end-to-end split (you need to fetch the model first):
 ```
-python ./jerex_test.py
+python ./jerex_test.py --config-path configs/docred_joint
 ```
+
+### Relation Extraction (only) model
+To run these examples, first download the original DocRED dataset into './data/datasets/docred/' (see 'https://github.com/thunlp/DocRED' for instructions)
+
+(1) Train JEREX (multi-instance relation classification component) using the orignal DocRED dataset.
+```
+python ./jerex_train.py --config-path configs/docred
+```
+
+(2) Evaluate JEREX (multi-instance relation classification component) on the original DocRED test set (you need to fetch the model first):
+```
+python ./jerex_test.py --config-path configs/docred
+```
+Since the original test set labels are hidden, the code will output an F1 score of 0. A 'predictions.json' file is saved, which can be used to retrieve test set metrics by uploading it to the DocRED CodaLab challenge (see https://github.com/thunlp/DocRED)
 
 ## Configuration / Hyperparameters
 - The hyperparameters used in our paper are set as default. You can adjust hyperparameters and other configuration settings in the 'train.yaml' and 'test.yaml' under ./configs
