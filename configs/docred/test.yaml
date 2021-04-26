@@ -11,6 +11,11 @@ model:
 inference:
   test_batch_size: 1
 
+distribution:
+  gpus: []
+  accelerator: ''
+  prepare_data_per_node: false
+
 hydra:
   run:
     dir: ./data/runs/${now:%Y-%m-%d}/${now:%H-%M-%S}
