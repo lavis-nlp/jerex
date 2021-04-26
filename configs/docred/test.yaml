@@ -1,0 +1,17 @@
+# Note: Test set labels are hidden. A 'predictions.json' file is stored after evaluation, which can be
+# uploaded to the original DocRED CodaLab challenge.
+dataset:
+  test_path: ./data/datasets/docred/dev.json
+
+model:
+  model_path: ./data/models/docred/rel_classify_multi_instance/model.ckpt
+  tokenizer_path: ./data/models/docred/rel_classify_multi_instance
+  encoder_config_path: ./data/models/docred/rel_classify_multi_instance
+
+inference:
+  test_batch_size: 1
+
+hydra:
+  run:
+    dir: ./data/runs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  output_subdir: run_config

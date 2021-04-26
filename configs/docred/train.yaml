@@ -1,0 +1,45 @@
+# to run this configuration, download original DocRED dataset (see https://github.com/thunlp/DocRED) into
+# ./data/datasets/docred/
+datasets:
+  train_path: ./data/datasets/docred/train_annotated.json
+  valid_path: ./data/datasets/docred/dev.json
+  types_path: ./data/datasets/docred/types.json
+
+model:
+  model_type: relation_classification_multi_instance
+  encoder_path: bert-base-cased
+  tokenizer_path: bert-base-cased
+  rel_threshold: 0.6
+  meta_embedding_size: 25
+  prop_drop: 0.1
+
+sampling:
+  neg_relation_count: 200
+  sampling_processes: 8
+
+training:
+  batch_size: 1
+  min_epochs: 20
+  max_epochs: 20
+  lr: 5e-5
+  lr_warmup: 0.1
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+
+inference:
+  valid_batch_size: 1
+  test_batch_size: 1
+
+distribution:
+  gpus: []
+  accelerator: ''
+  prepare_data_per_node: false
+
+misc:
+  store_predictions: true
+  store_examples: true
+
+hydra:
+  run:
+    dir: ./data/runs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  output_subdir: run_config

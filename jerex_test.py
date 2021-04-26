@@ -9,7 +9,7 @@ cs = ConfigStore.instance()
 cs.store(name="test", node=TestConfig)
 
 
-@hydra.main(config_name='test', config_path='configs')
+@hydra.main(config_name='test', config_path='configs/docred_joint')
 def train(cfg: TestConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
 
@@ -18,8 +18,6 @@ def train(cfg: TestConfig) -> None:
     util.config_to_abs_paths(cfg.misc, 'cache_path')
 
     model.test(cfg)
-
-
 
 
 if __name__ == '__main__':
