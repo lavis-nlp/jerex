@@ -192,9 +192,10 @@ class JEREXModel(pl.LightningModule):
         optimizer = AdamW(optimizer_params, lr=self._lr, weight_decay=self._weight_decay)
 
         dataloader = self.train_dataloader()
+        train_batch_count = len(dataloader)
 
-        train_doc_count = len(dataloader)
-        updates_epoch = train_doc_count // dataloader.batch_size
+        gpu_dist = self.trainer.num_gpus if self.trainer.use_ddp else 1
+        updates_epoch = train_batch_count // (gpu_dist * self.trainer.accumulate_grad_batches)
         updates_total = updates_epoch * self.trainer.max_epochs
 
         scheduler = transformers.get_linear_schedule_with_warmup(optimizer,
