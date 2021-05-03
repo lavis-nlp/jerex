@@ -24,12 +24,13 @@ class RelationClassificationMultiInstance(nn.Module):
                 rel_mention_pairs, rel_ctx_masks, rel_pair_masks, rel_token_distances, rel_sentence_distances,
                 rel_entity_types, max_pairs=None):
         batch_size = entity_pair_reprs.shape[0]
+        hidden_size = h.shape[-1]
 
         # relations
         # obtain relation logits
         # chunk processing to reduce memory usage
         max_pairs = max_pairs if max_pairs is not None else rel_mention_pairs.shape[1]
-        rel_mention_pair_reprs = torch.zeros([batch_size, rel_mention_pairs.shape[1], 768]).to(self._device)
+        rel_mention_pair_reprs = torch.zeros([batch_size, rel_mention_pairs.shape[1], hidden_size]).to(self._device)
         h = h.unsqueeze(1)
 
         for i in range(0, rel_mention_pairs.shape[1], max_pairs):
