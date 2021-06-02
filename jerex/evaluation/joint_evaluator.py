@@ -116,10 +116,15 @@ class JointEvaluator(Evaluator):
             mentions, clusters, entities, relations, relations_et = doc_predictions
 
             doc_converted_predictions['tokens'] = [t.phrase for t in doc.tokens]
-            doc_converted_predictions['mentions'] = mentions
-            doc_converted_predictions['clusters'] = [[mentions.index(s) for s in c] for c in clusters]
-            doc_converted_predictions['entities'] = [dict(cluster=clusters.index(e[0]),
-                                                          type=e[1].identifier) for e in entities]
+            doc_converted_predictions['mentions'] = [dict(start=m[0], end=m[1]) for m in mentions]
+
+            converted_entities = [dict(mentions=[mentions.index(s) for s in c]) for c in clusters]
+            doc_converted_predictions['entities'] = converted_entities
+
+            for e in entities:
+                cluster_index = clusters.index(e[0])
+                converted_entities[cluster_index]['type'] = e[1].identifier
+
             doc_converted_predictions['relations'] = [dict(head=entities.index(r[0]),
                                                            tail=entities.index(r[1]),
                                                            type=r[2].identifier) for r in relations_et]

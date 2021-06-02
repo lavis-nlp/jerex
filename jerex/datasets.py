@@ -44,7 +44,6 @@ class DocREDDataset(TorchDataset):
         self._rid = 0
         self._eid = 0
         self._meid = 0
-        self._pid = 0
         self._tid = 0
 
         self._parse_dataset(dataset_path)
@@ -57,7 +56,7 @@ class DocREDDataset(TorchDataset):
 
     def _parse_dataset(self, dataset_path):
         documents = json.load(open(dataset_path))
-        for document in tqdm(documents, desc="Parse dataset '%s'" % self._dataset_path):
+        for document in tqdm(documents[:10], desc="Parse dataset '%s'" % self._dataset_path):
             self._parse_document(document)
 
     def _parse_document(self, doc):
@@ -165,9 +164,9 @@ class DocREDDataset(TorchDataset):
         return token
 
     def _create_sentence(self, index: int, tokens: List[Token]) -> Sentence:
-        mention = Sentence(self._sid, index, tokens)
+        sentence = Sentence(self._sid, index, tokens)
         self._sid += 1
-        return mention
+        return sentence
 
     def _create_document(self, tokens, sentences, entities, relations, doc_encoding, title) -> Document:
         document = Document(self._doc_id, tokens, sentences, entities, relations, doc_encoding, title)
