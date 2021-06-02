@@ -56,7 +56,7 @@ class DocREDDataset(TorchDataset):
 
     def _parse_dataset(self, dataset_path):
         documents = json.load(open(dataset_path))
-        for document in tqdm(documents[:10], desc="Parse dataset '%s'" % self._dataset_path):
+        for document in tqdm(documents, desc="Parse dataset '%s'" % self._dataset_path):
             self._parse_document(document)
 
     def _parse_document(self, doc):
