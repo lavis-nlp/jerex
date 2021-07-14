@@ -44,7 +44,11 @@ def score(gt: List[List[Tuple]], pred: List[List[Tuple]], type_idx=None, print_r
                 pred_flat.append(-1)
 
     if type_idx is not None:
-        labels, labels_str = zip(*[(l.index, l.short_name) for l in labels])
+        if labels:
+            labels, labels_str = zip(*[(l.index, l.short_name) for l in labels])
+        else:
+            # corner case: no prediction and ground truth samples
+            labels, labels_str = [0], ['None']
     else:
         labels, labels_str = [0], ['Binary']
 
