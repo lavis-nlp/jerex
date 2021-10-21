@@ -22,7 +22,7 @@ Execute the following steps before running the examples.
 
 (1) Fetch end-to-end (joint) DocRED [1] dataset split. For the original DocRED split, see https://github.com/thunlp/DocRED :
 ```
-bash ./scripts/fetch_dataset.sh
+bash ./scripts/fetch_datasets.sh
 ```
 
 (2) Fetch model checkpoints (joint multi-instance model (end-to-end split) and relation classification multi-instance model (original split)):
