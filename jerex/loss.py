@@ -54,12 +54,16 @@ class JointLoss(Loss):
         entity_clf = entity_clf.view(-1, entity_clf.shape[-1])
         entity_types = entity_types.view(-1)
         entity_sample_masks = entity_sample_masks.view(-1).float()
+        entity_count = entity_sample_masks.sum()
 
-        sample_entity_loss = self._entity_criterion(entity_clf, entity_types)
-        entity_loss = (sample_entity_loss * entity_sample_masks).sum() / entity_sample_masks.sum()
+        if entity_count.item() != 0:
+            sample_entity_loss = self._entity_criterion(entity_clf, entity_types)
+            entity_loss = (sample_entity_loss * entity_sample_masks).sum() / entity_count
 
-        losses.append(entity_loss)
-        loss_dict['entity_loss'] = entity_loss
+            losses.append(entity_loss)
+            loss_dict['entity_loss'] = entity_loss
+        else:
+            losses.append(0)
 
         # relation loss
         rel_sample_masks = rel_sample_masks.view(-1).float()
