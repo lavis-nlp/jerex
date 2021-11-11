@@ -106,7 +106,7 @@ def create_clusters(coref_clf: torch.tensor, mention_pairs: torch.tensor, pair_s
         clusters = None
 
         if len(doc_valid_mentions) == 1:
-            clusters = [[0]]
+            clusters = [[doc_valid_mentions[0]]]
         elif doc_valid_mentions:
             # we only cluster valid mentions (according to mention localization step)
             # these must later (after clustering) be mapped back to indices in full mention candidate tensor
