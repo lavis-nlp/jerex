@@ -10,7 +10,7 @@ cs.store(name="test", node=TestConfig)
 
 
 @hydra.main(config_name='test', config_path='configs/docred_joint')
-def train(cfg: TestConfig) -> None:
+def test(cfg: TestConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
 
     util.config_to_abs_paths(cfg.dataset, 'test_path')
@@ -21,4 +21,4 @@ def train(cfg: TestConfig) -> None:
 
 
 if __name__ == '__main__':
-    train()
+    test()

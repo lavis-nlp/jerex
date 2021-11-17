@@ -361,7 +361,7 @@ def test(cfg: TestConfig):
                                             max_rel_pairs_inference=cfg.inference.max_rel_pairs,
                                             encoder_path=None, **overrides)
 
-    tokenizer = BertTokenizer.from_pretrained(model.hparams.tokenizer_path,
+    tokenizer = BertTokenizer.from_pretrained(cfg.model.tokenizer_path,
                                               do_lower_case=model.hparams.lowercase,
                                               cache_dir=model.hparams.cache_path)
 
