@@ -57,6 +57,10 @@ python ./jerex_test.py --config-path configs/docred
 ```
 Since the original test set labels are hidden, the code will output an F1 score of 0. A 'predictions.json' file is saved, which can be used to retrieve test set metrics by uploading it to the DocRED CodaLab challenge (see https://github.com/thunlp/DocRED)
 
+## Reproduction and Evaluation
+- If you want to compare your end-to-end model to JEREX using the strict evaluation setting, have a look at our [evaluation script](https://github.com/lavis-nlp/jerex/blob/main/jerex/evaluation/joint_evaluator.py).
+- The DocRED dataset contains some duplicate annotations (especially entity mentions). Duplicates are removed during evaluation (i.e. only counted once).
+
 ## Configuration / Hyperparameters
 - The hyperparameters used in our paper are set as default. You can adjust hyperparameters and other configuration settings in the 'train.yaml' and 'test.yaml' under ./configs
 - Settings can also be overriden via command line, e.g.:
