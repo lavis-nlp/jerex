@@ -19,7 +19,8 @@ class DocREDDataset(TorchDataset):
     INFERENCE_MODE = 'inference'
 
     def __init__(self, dataset_path, entity_types, relation_types, tokenizer, neg_mention_count=200,
-                 neg_rel_count=200, neg_coref_count=200, max_span_size=10, neg_mention_overlap_ratio=0.5):
+                 neg_rel_count=200, neg_coref_count=200, max_span_size=10, neg_mention_overlap_ratio=0.5,
+                 size_embeddings_count=30):
         self._dataset_path = dataset_path
         self._entity_types = entity_types
         self._relation_types = relation_types
@@ -29,6 +30,7 @@ class DocREDDataset(TorchDataset):
         self._max_span_size = max_span_size
         self._neg_mention_overlap_ratio = neg_mention_overlap_ratio
         self._tokenizer = tokenizer
+        self._size_embeddings_count = size_embeddings_count
 
         self._mode = DocREDDataset.TRAIN_MODE
         self._task = None
@@ -204,7 +206,8 @@ class DocREDDataset(TorchDataset):
                 return sampling_joint.create_joint_train_sample(doc, self._neg_mention_count, self._neg_rel_count,
                                                                 self._neg_coref_count,
                                                                 self._max_span_size, self._neg_mention_overlap_ratio,
-                                                                len(self._relation_types))
+                                                                len(self._relation_types),
+                                                                self._size_embeddings_count)
             elif self._task == TaskType.MENTION_LOCALIZATION:
                 return sampling_classify.create_mention_classify_train_sample(doc, self._neg_mention_count,
                                                                               self._max_span_size,

@@ -19,7 +19,8 @@ class DocREDDataModule(pl.LightningDataModule):
                  sampling_processes: int = 4, neg_mention_count: int = 50,
                  neg_relation_count: int = 50, neg_coref_count: int = 50,
                  max_span_size: int = 10, neg_mention_overlap_ratio: float = 0.5,
-                 final_valid_evaluate: bool = False):
+                 final_valid_evaluate: bool = False,
+                 size_embeddings_count: int = 30):
         super().__init__()
 
         if types_path is not None:
@@ -56,6 +57,7 @@ class DocREDDataModule(pl.LightningDataModule):
         self._neg_coref_count = neg_coref_count
         self._max_span_size = max_span_size
         self._neg_mention_overlap_ratio = neg_mention_overlap_ratio
+        self._size_embeddings_count = size_embeddings_count
 
         self._train_path = train_path
         self._valid_path = valid_path
@@ -81,7 +83,8 @@ class DocREDDataModule(pl.LightningDataModule):
                                                     neg_rel_count=self._neg_relation_count,
                                                     max_span_size=self._max_span_size,
                                                     neg_mention_overlap_ratio=self._neg_mention_overlap_ratio,
-                                                    tokenizer=self._tokenizer)
+                                                    tokenizer=self._tokenizer,
+                                                    size_embeddings_count=self._size_embeddings_count)
 
                 self._train_dataset.switch_task(self._task_type)
                 self._train_dataset.switch_mode(DocREDDataset.TRAIN_MODE)
@@ -91,7 +94,8 @@ class DocREDDataModule(pl.LightningDataModule):
                                                     entity_types=self._entity_types,
                                                     relation_types=self._relation_types,
                                                     max_span_size=self._max_span_size,
-                                                    tokenizer=self._tokenizer)
+                                                    tokenizer=self._tokenizer,
+                                                    size_embeddings_count=self._size_embeddings_count)
 
                 self._valid_dataset.switch_task(self._task_type)
                 self._valid_dataset.switch_mode(DocREDDataset.INFERENCE_MODE)
@@ -104,7 +108,8 @@ class DocREDDataModule(pl.LightningDataModule):
                                                    entity_types=self._entity_types,
                                                    relation_types=self._relation_types,
                                                    max_span_size=self._max_span_size,
-                                                   tokenizer=self._tokenizer)
+                                                   tokenizer=self._tokenizer,
+                                                   size_embeddings_count=self._size_embeddings_count)
             else:
                 self._test_dataset = self._valid_dataset
 
@@ -112,7 +117,7 @@ class DocREDDataModule(pl.LightningDataModule):
             self._test_dataset.switch_mode(DocREDDataset.INFERENCE_MODE)
 
     def train_dataloader(self):
-        return DataLoader(self._train_dataset, batch_size=self._train_batch_size, shuffle=True, drop_last=True,
+        return DataLoader(self._train_dataset, batch_size=self._train_batch_size, shuffle=False, drop_last=True,
                           num_workers=self._sampling_processes,
                           collate_fn=collate_fn_padding)
 

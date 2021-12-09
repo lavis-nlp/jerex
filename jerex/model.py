@@ -286,7 +286,8 @@ def train(cfg: TrainConfig):
                                    max_span_size=cfg.sampling.max_span_size,
                                    neg_mention_overlap_ratio=cfg.sampling.neg_mention_overlap_ratio,
                                    final_valid_evaluate=cfg.misc.final_valid_evaluate
-                                                        and cfg.datasets.test_path is None)
+                                                        and cfg.datasets.test_path is None,
+                                    size_embeddings_count=cfg.model.size_embeddings_count)
 
     data_module.setup('fit')
 
