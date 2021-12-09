@@ -7,7 +7,8 @@ from jerex.sampling.sampling_common import create_mention_candidates, create_con
 
 
 def create_joint_train_sample(doc: Document, neg_mention_count: int, neg_rel_count: int, neg_coref_count: int,
-                              max_span_size: int, neg_mention_overlap_ratio: float, rel_type_count: int):
+                              max_span_size: int, neg_mention_overlap_ratio: float, rel_type_count: int,
+                              size_embeddings_count: int):
     encodings = doc.encodings  # document sub-word encoding
     context_size = len(encodings)
 
@@ -89,6 +90,7 @@ def create_joint_train_sample(doc: Document, neg_mention_count: int, neg_rel_cou
     assert len(coref_mention_pairs) == len(coref_sample_masks) == len(coref_types) == len(coref_eds)
     assert len(entities) == len(entity_types)
     assert len(rel_entity_pairs) == len(rel_types)
+    assert mention_sizes.max().item() < size_embeddings_count, f"You should increase the `size_embeddings_count` config.model section atleast to {mention_sizes.max()}"
 
     return dict(encodings=encodings, context_masks=context_masks, mention_masks=mention_masks,
                 mention_sizes=mention_sizes, mention_types=mention_types, mention_sample_masks=mention_sample_masks,
